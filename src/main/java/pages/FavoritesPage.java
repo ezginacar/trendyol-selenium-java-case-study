@@ -1,23 +1,26 @@
 package pages;
 
 import driver.DriverManager;
-import helpers.LocatorHelper;
+import helpers.LocatorActionHelper;
+import helpers.LocatorQueryHelper;
+import helpers.NavigationHelper;
 import helpers.WaitHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import utils.ExcelUtil;
 
 import java.util.List;
 
-import static helpers.LocatorHelper.click;
-import static helpers.LocatorHelper.isDisplayed;
+import static helpers.LocatorActionHelper.click;
+import static helpers.LocatorQueryHelper.isDisplayed;
 
 public class FavoritesPage {
 
-    private By productCards = By.className("product-card");
+    private By productCards = By.cssSelector(".favorites-product-list .product-card");
     private By addBasketButton = By.className("add-to-basket-button");
-    private By successAlert = By.cssSelector("[.success-alert.show");
-    private By actionMenu = By.cssSelector("data-testid=\"action-menu\"");
+    private By successAlert = By.cssSelector(".success-alert.show");
+    private By actionMenu = By.cssSelector("[data-testid='action-menu-trigger']");
     private By removeFavoritesOption = By.cssSelector(".action-menu-dropdown>button.danger");
 
     public boolean isAtFavoritePage() {
@@ -27,11 +30,10 @@ public class FavoritesPage {
 
     public boolean isTheProductInFavorites(String productId) {
         List<WebElement> products = WaitHelper.waitForAllVisibility(productCards);
-        String expectedHref = String.format("p-%s?", productId);
+        String expectedHref = String.format("p-%s", productId);
 
         for (WebElement product : products) {
-            String href = LocatorHelper.getAttribute(product, "href");
-
+            String href = LocatorQueryHelper.getAttribute(product, "href");
             if (href != null && href.contains(expectedHref)) {
                 return true;
             }
@@ -44,19 +46,17 @@ public class FavoritesPage {
 
     public void clickAddBasketButtonWithID(String productId) {
         List<WebElement> products = WaitHelper.waitForAllVisibility(productCards);
-        String expectedHref = String.format("p-%s?", productId);
+        String expectedHref = String.format("p-%s", productId);
 
         for (WebElement product : products) {
-
-            WebElement productLink = product.findElement(By.tagName("a"));
-            String href = productLink.getAttribute("href");
+            String href = product.getAttribute("href");
 
             if (href != null && href.contains(expectedHref)) {
 
                 WebElement addBasket =
                         product.findElement(addBasketButton);
 
-                LocatorHelper.click(addBasket);
+                LocatorActionHelper.click(addBasket);
                 return;
             }
         }
@@ -70,22 +70,26 @@ public class FavoritesPage {
     }
 
     public boolean hasFavouriteActionIcon() {
-        return !LocatorHelper.isEmpty(actionMenu);
+        return !LocatorQueryHelper.isEmpty(actionMenu);
 
     }
 
     public void removeAllFavourites(){
         while (hasFavouriteActionIcon()) {
 
-            List<WebElement> actionIcons = LocatorHelper.getElements(actionMenu);
-
+            List<WebElement> actionIcons = LocatorQueryHelper.getElements(actionMenu);
             int previousCount = actionIcons.size();
+
             WebElement firstActionMenu = actionIcons.get(0);
+
             click(firstActionMenu);
             click(removeFavoritesOption);
-            WaitHelper.waitUntilElementCountDecreases(removeFavoritesOption, previousCount);
-
+            WaitHelper.waitUntilElementCountDecreases(actionMenu, previousCount);
         }
+    }
+
+    public void navigateFavourites(){
+         NavigationHelper.navigateToUrl(ExcelUtil.getValue("baseUrl") + "/hesabim/favoriler");
     }
 }
 

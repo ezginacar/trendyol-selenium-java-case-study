@@ -3,8 +3,8 @@ package pages;
 import org.openqa.selenium.By;
 
 import static driver.DriverManager.getCurrentUrl;
-import static helpers.LocatorHelper.click;
-import static helpers.LocatorHelper.isDisplayed;
+import static helpers.LocatorActionHelper.click;
+import static helpers.LocatorQueryHelper.isDisplayed;
 
 public class ProductDetailPage {
     private By favoriteButton = By.cssSelector("button[data-testid='favorite-button']");

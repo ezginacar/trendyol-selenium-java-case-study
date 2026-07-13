@@ -17,7 +17,6 @@ The framework is built with maintainability, readability and scalability in mind
 - Apache POI
 - Allure Report
 - SLF4J + Log4j2
-- Lombok
 
 ---
 
