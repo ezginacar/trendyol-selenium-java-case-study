@@ -1,12 +1,12 @@
 package pages;
 
+import helpers.WaitHelper;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.ExcelUtil;
 
-import static helpers.LocatorHelper.click;
-import static helpers.LocatorHelper.sendKeys;
+import static helpers.LocatorActionHelper.click;
+import static helpers.LocatorActionHelper.sendKeys;
 
 public class LoginPage {
 
@@ -17,6 +17,7 @@ public class LoginPage {
     private By emailCheckButton = By.cssSelector("[data-testid='email-check-button']");
     private By passwordInput = By.id("login-password");
     private By loginButton = By.cssSelector("[data-testid='login-button']");
+    private final By poseidonLoader = By.cssSelector("div.poseidon-loader-container.fixed");
 
 
 
@@ -29,6 +30,7 @@ public class LoginPage {
         sendKeys(passwordInput, password);
         logger.info("Password entered: " + password);
         click(loginButton);
+        WaitHelper.waitForDisappear(poseidonLoader);
     }
 
 

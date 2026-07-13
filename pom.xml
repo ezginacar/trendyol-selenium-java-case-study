@@ -17,10 +17,9 @@
         <testng.version>7.10.2</testng.version>
         <poi.version>5.2.5</poi.version>
         <slf4j.version>2.0.13</slf4j.version>
-        <log4j.version>2.25.2</log4j.version>
         <allure.version>2.27.0</allure.version>
-        <aspectj.version>1.9.22</aspectj.version>
-        <lombok.version>1.18.42</lombok.version>
+        <aspectj.version>1.9.24</aspectj.version>
+        <logback.version>1.4.14</logback.version>
     </properties>
 
     <dependencies>
@@ -42,13 +41,11 @@
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>io.qameta.allure</groupId>
@@ -63,24 +60,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j2-impl</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-
-
     </dependencies>
 
     <build>
@@ -89,14 +73,34 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
-
                 <configuration>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
                     <systemPropertyVariables>
                         <allure.results.directory>
                             ${project.build.directory}/allure-results
                         </allure.results.directory>
                     </systemPropertyVariables>
+                    <properties>
+                        <property>
+                            <name>groups</name>
+                            <value>e2e</value>
+                        </property>
+                    </properties>
+                    <trimStackTrace>true</trimStackTrace>
+                    <printSummary>true</printSummary>
+                    <reportFormat>brief</reportFormat>
+                    <useFile>false</useFile>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -105,7 +109,9 @@
                 <version>2.12.0</version>
                 <configuration>
                     <reportVersion>${allure.version}</reportVersion>
-                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                    <resultsDirectory>
+                        ${project.build.directory}/allure-results
+                    </resultsDirectory>
                 </configuration>
             </plugin>
         </plugins>

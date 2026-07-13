@@ -419,32 +419,32 @@ public final class ExcelTestResultUtil {
             String status,
             Workbook workbook
     ) {
-        CellStyle style =
-                workbook.createCellStyle();
+        CellStyle style = workbook.createCellStyle();
 
-        Font font =
-                workbook.createFont();
-
+        Font font = workbook.createFont();
         font.setBold(true);
+        font.setColor(IndexedColors.BLACK.getIndex());
         style.setFont(font);
 
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+
         if ("PASS".equalsIgnoreCase(status)) {
-            style.setFillForegroundColor(
-                    IndexedColors.LIGHT_GREEN.getIndex()
-            );
+            style.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+
         } else if ("FAIL".equalsIgnoreCase(status)) {
-            style.setFillForegroundColor(
-                    IndexedColors.ROSE.getIndex()
-            );
+            style.setFillForegroundColor(IndexedColors.RED.getIndex());
+
         } else if ("SKIPPED".equalsIgnoreCase(status)) {
-            style.setFillForegroundColor(
-                    IndexedColors.LIGHT_YELLOW.getIndex()
-            );
+            style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
         }
 
-        style.setFillPattern(
-                FillPatternType.SOLID_FOREGROUND
-        );
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
 
         statusCell.setCellStyle(style);
     }
@@ -479,8 +479,7 @@ public final class ExcelTestResultUtil {
             String metric,
             String value
     ) {
-        Row row =
-                sheet.createRow(rowIndex);
+        Row row = sheet.createRow(rowIndex);
 
         row.createCell(0).setCellValue(metric);
         row.createCell(1).setCellValue(value);

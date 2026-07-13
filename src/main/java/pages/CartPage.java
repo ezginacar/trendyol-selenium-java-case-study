@@ -1,81 +1,97 @@
 package pages;
 
 import driver.DriverManager;
-import helpers.LocatorHelper;
+import helpers.LocatorActionHelper;
+import helpers.LocatorQueryHelper;
+import helpers.NavigationHelper;
 import helpers.WaitHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ExcelUtil;
 
 import java.util.List;
 
+import static driver.DriverManager.getCurrentUrl;
+import static driver.DriverManager.refreshPage;
+
 
 public class CartPage {
 
     private By basketSummaryContent = By.cssSelector("[data-testid='basket-summary']");
     private By removeButtons = By.className("remove-item-container");
+    private By productCards = By.className("merchant-item-container");
 
     private static final Logger logger = LoggerFactory.getLogger(CartPage.class);
 
     public boolean isUserNavigatedTheCartPage() {
-        return LocatorHelper.isDisplayed(basketSummaryContent);
+        return LocatorQueryHelper.isDisplayed(basketSummaryContent);
     }
 
     public void clickDeleteButtonWithProductID(String productId) {
-        By productCard = By.cssSelector(
-                String.format("[id*='basket-item@%s-']", productId)
-        );
-        LocatorHelper.click(productCard);
+        List<WebElement> products = WaitHelper.waitForAllVisibility(productCards);
+        String expectedId = String.format("basket-item@%s", productId);
 
+        WebElement targetProductCard = products.stream()
+                .filter(product -> {
+                    String id = product.getAttribute("id");
+                    return id != null && id.contains(expectedId);
+                })
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException(
+                        "C " + productId
+                ));
+
+        WebElement deleteButton = targetProductCard.findElement(removeButtons);
+        LocatorActionHelper.clickWithJS(deleteButton);
+        refreshPage();
     }
 
 
     public boolean isProductDisplayedOnBasket(String productId) {
-        By productCard = By.cssSelector(
-                String.format("[id*='basket-item@%s-']", productId)
-        );
+        List<WebElement> products =  DriverManager.getDriver().findElements(productCards);
 
-        return !DriverManager.getDriver()
-                .findElements(productCard)
-                .isEmpty();
+        if (products.isEmpty()) {
+            return false;
+        }
+
+        String expectedId = String.format("basket-item@%s-", productId);
+        for (WebElement product : products) {
+            String id = product.getAttribute("id");
+            if (id != null && id.contains(expectedId)) {
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
 
-    private final By cartItems =
-
-            By.cssSelector("[data-testid='basket-item']");
-
-    private final By deleteButtons =
-
-            By.cssSelector("[data-testid='basket-item-remove-button']");
-
-    private final By emptyCartMessage =
-
-            By.cssSelector("[data-testid='empty-basket']");
-
     public boolean hasProducts() {
-
-        return !LocatorHelper.getElements(removeButtons).isEmpty();
-
+        return !LocatorQueryHelper.getElements(removeButtons).isEmpty();
     }
 
     public void deleteAllProducts() {
 
         while (hasProducts()) {
-
-            List<WebElement> currentDeleteButtons = LocatorHelper.getElements(removeButtons);
+            List<WebElement> currentDeleteButtons = LocatorQueryHelper.getElements(removeButtons);
 
             int previousCount = currentDeleteButtons.size();
             WebElement firstDeleteButton = currentDeleteButtons.get(0);
 
-            LocatorHelper.click(firstDeleteButton);
+            LocatorActionHelper.click(firstDeleteButton);
+            refreshPage();
             WaitHelper.waitUntilElementCountDecreases(removeButtons, previousCount);
 
         }
 
+    }
+
+    public void navigateCart(){
+        NavigationHelper.navigateToUrl(ExcelUtil.getValue("baseUrl") + "/sepetim");
     }
 
 

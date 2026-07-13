@@ -11,7 +11,7 @@ import java.util.List;
 
 public class WaitHelper {
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
 
     private WaitHelper() {}
 
@@ -49,6 +49,18 @@ public class WaitHelper {
         getWait().until(driver ->
                 DriverManager.getDriver().findElements(locator).size() < previousCount
         );
+    }
+
+    public static void waitForDisappear(By locator) {
+        getWait().until( ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
+    public static void waitForSeconds(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
 

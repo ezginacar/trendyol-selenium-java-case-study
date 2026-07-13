@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{20}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.maven.surefire" level="OFF"/>
+    <logger name="org.testng" level="OFF"/>
+    <logger name="io.qameta.allure" level="OFF"/>
+    <logger name="org.openqa.selenium" level="OFF"/>
+    <logger name="org.apache.poi" level="OFF"/>
+
+    <logger name="tests" level="INFO"/>
+    <logger name="pages" level="INFO"/>
+    <logger name="helpers" level="INFO"/>
+    <logger name="driver" level="INFO"/>
+    <logger name="listeners" level="INFO"/>
+    <logger name="utils" level="INFO"/>
+
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

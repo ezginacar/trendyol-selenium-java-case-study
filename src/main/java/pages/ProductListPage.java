@@ -11,13 +11,16 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 
-import static helpers.LocatorHelper.*;
+import static helpers.LocatorActionHelper.*;
+import static helpers.LocatorQueryHelper.getText;
+import static helpers.LocatorQueryHelper.isDisplayed;
+import static helpers.WaitHelper.waitForSeconds;
 
 public class ProductListPage {
     private static final Logger logger = LoggerFactory.getLogger(ProductListPage.class);
 
     private By categoryFilterSearchInput = By.xpath("//*[@data-aggregationtype='LeafCategory']//*[@data-testid='search-input-container']/input");
-    private By categoryFilterMatchedSingleCheckboxItem = By.xpath("//*[@data-aggregationtype='LeafCategory']//*[@data-testid='checkbox-list-item']");
+    private By categoryFilterMatchedSingleCheckboxItem = By.xpath("//*[@data-aggregationtype='LeafCategory']//*[@data-testid='checkbox-list-item']/label[@class='checkbox-root']");
     private By searchResultTitleText = By.cssSelector("[data-testid='web-search-result-header'] .title");
     private By noResultFoundContainer = By.cssSelector("[data-testid='not-found-content']");
     private By productCards = By.className("product-card");
@@ -26,11 +29,14 @@ public class ProductListPage {
 
     public void selectMatchesSingleItemFromCategoryFilter(String checkBoxItemName) {
         sendKeys(categoryFilterSearchInput, checkBoxItemName);
-        click(categoryFilterMatchedSingleCheckboxItem);
+        waitForSeconds(2);
+        forceClickAndDispatchEvent(categoryFilterMatchedSingleCheckboxItem);
+        waitForSeconds(2);
+
     }
 
     public String getTextOfSearchResultTitle() {
-        return searchResultTitleText.toString();
+        return getText(searchResultTitleText);
     }
 
     public void navigateNthPage(int pageNumber) {

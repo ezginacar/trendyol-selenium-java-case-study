@@ -6,7 +6,7 @@ import org.testng.ITestListener;
 import org.testng.ITestResult;
 import utils.ExcelTestResultUtil;
 
-public class TestResultListener
+public class ExcelTestResultListener
         implements ITestListener, ISuiteListener {
 
     @Override
@@ -15,69 +15,64 @@ public class TestResultListener
     }
 
     @Override
-    public void onFinish(ISuite suite) {
-        ExcelTestResultUtil.finalizeSummary();
-    }
-
-    @Override
     public void onTestSuccess(ITestResult result) {
-        ExcelTestResultUtil.writeResult(
-                getTestName(result),
-                "PASS",
-                "",
-                getDuration(result)
-        );
+        writeResult(result, "PASS");
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        ExcelTestResultUtil.writeResult(
-                getTestName(result),
-                "FAIL",
-                getFailureReason(result),
-                getDuration(result)
-        );
+        writeResult(result, "FAIL");
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        writeResult(result, "SKIPPED");
+    }
+
+    @Override
+    public void onFinish(ISuite suite) {
+        ExcelTestResultUtil.finalizeSummary();
+    }
+
+    private void writeResult(
+            ITestResult result,
+            String status
+    ) {
         ExcelTestResultUtil.writeResult(
                 getTestName(result),
-                "SKIPPED",
+                status,
                 getFailureReason(result),
                 getDuration(result)
         );
     }
 
-    private long getDuration(
-            ITestResult result
-    ) {
-        return result.getEndMillis()
-                - result.getStartMillis();
+    private long getDuration(ITestResult result) {
+        return Math.max(
+                0,
+                result.getEndMillis()
+                        - result.getStartMillis()
+        );
     }
 
-    private String getTestName(
-            ITestResult result
-    ) {
+    private String getTestName(ITestResult result) {
         return result.getTestClass()
                 .getRealClass()
                 .getSimpleName()
                 + "."
-                + result.getMethod().getMethodName();
+                + result.getMethod()
+                .getMethodName();
     }
 
     private String getFailureReason(
             ITestResult result
     ) {
-        Throwable throwable =
-                result.getThrowable();
+        Throwable throwable = result.getThrowable();
 
         if (throwable == null) {
             return "";
         }
 
-        String message =
-                throwable.getMessage();
+        String message = throwable.getMessage();
 
         if (message == null || message.isBlank()) {
             return throwable.getClass()
