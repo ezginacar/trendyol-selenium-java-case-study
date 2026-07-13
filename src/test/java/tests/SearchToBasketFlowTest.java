@@ -1,7 +1,6 @@
 package tests;
 
 
-import helpers.LocatorHelper;
 import io.qameta.allure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class SearchToBasketFlowTest extends BaseTest {
         )
         @Severity(SeverityLevel.CRITICAL)
         @Test(description = "Search, Favorite and Cart Flow Test",
-              groups = {"e2e", "cart", "regression"})
+              groups = {"e2e"})
         public void shouldAddFavoriteProductToCartAndRemoveIt() {
             final String[] productIdHolder = new String[1];
 
@@ -88,13 +87,13 @@ public class SearchToBasketFlowTest extends BaseTest {
             Allure.step(
                     "Precondition: Clear existing cart items and favorite products",
                     () -> {
-                        homePage.clickBasketIcon();
+                        cartPage.navigateCart();
                         log.info("User is at card page");
                         cartPage.deleteAllProducts();
                         Assert.assertFalse(cartPage.hasProducts(), "Empty card precondition failed.");
                         log.info("All cards removed");
 
-                        homePage.clickFavoriteButton();
+                        favoritesPage.navigateFavourites();
                         log.info("User is at favourites page");
                         favoritesPage.removeAllFavourites();
                         Assert.assertFalse(favoritesPage.hasFavouriteActionIcon(), "Empty favourites precondition failed.");
@@ -105,16 +104,16 @@ public class SearchToBasketFlowTest extends BaseTest {
 
 
 
+
+
             Allure.step( "3. Type '" + ExcelUtil.getValue("searchKey") + "' in the search field and click the search button",
                     () -> {
-
                         homePage.searchFromSuggestion(ExcelUtil.getValue("searchKey"));
                         log.info("Search for '{}' is performed.", ExcelUtil.getValue("searchKey"));
 
                     }
 
             );
-
 
             Allure.step(
 
@@ -125,9 +124,10 @@ public class SearchToBasketFlowTest extends BaseTest {
                         log.info( "Selecting main category '{}' and subcategory '{}'",  ExcelUtil.getValue("mainCategory"), ExcelUtil.getValue("subCategory"));
                         productListPage.selectMatchesSingleItemFromCategoryFilter(ExcelUtil.getValue("subCategory"));
 
-                        Assert.assertTrue(
-                                productListPage.getTextOfSearchResultTitle().equals("{} {}".formatted(TextUtil.capitalizeFirstLetter(ExcelUtil.getValue("searchKey")),ExcelUtil.getValue("subCategory"))),
-                                "Search result title does not match the expected format.");
+                        String expectedTitle =  "%s %s".formatted( TextUtil.capitalizeFirstLetter(ExcelUtil.getValue("searchKey")), ExcelUtil.getValue("subCategory"));
+                        String actualTitle = productListPage.getTextOfSearchResultTitle();
+                        Assert.assertEquals(actualTitle, expectedTitle,
+                                "Search result title mismatch.%nExpected: %s%nActual: %s".formatted(expectedTitle, actualTitle));
 
 
 
@@ -226,10 +226,7 @@ public class SearchToBasketFlowTest extends BaseTest {
                                 "The product with ID " + productIdHolder[0] + " is not found in the favorites list. The product may not have been added to favorites."
                         );
 
-                        log.info(
-
-                                "The product with ID {} is successfully found in the favorites list.",productIdHolder[0]
-                        );
+                        log.info( "The product with ID {} is successfully found in the favorites list.",productIdHolder[0]);
 
                     }
 
@@ -279,17 +276,12 @@ public class SearchToBasketFlowTest extends BaseTest {
                         log.info("Clicked delete button for the product with ID: {}", productIdHolder[0]);
 
                         Assert.assertFalse(cartPage.isProductDisplayedOnBasket(productIdHolder[0]), "The product with ID " +productIdHolder[0] + " is still found in the cart after, deletion. The product may not have been removed from the cart.");
-
                         log.info("Product with ID {} is successfully removed from the cart.", productIdHolder[0]);
-
                     }
 
             );
 
-            log.info(
-
-                    "Search  to Basket flow test completed successfully for product ID: {}", productIdHolder[0]
-            );
+            log.info("Search  to Basket flow test completed successfully for product ID: {}", productIdHolder[0] );
 
         }
 
