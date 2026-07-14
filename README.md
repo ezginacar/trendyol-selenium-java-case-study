@@ -165,7 +165,8 @@ target/allure-results
 To generate and open the report:
 
 ```bash
-mvn allure:serve
+ mvn clean test
+ allure serve target/allure-results
 ```
 
 Failed test screenshots are automatically attached to the Allure report.
